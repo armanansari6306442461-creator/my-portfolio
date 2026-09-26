@@ -119,10 +119,6 @@ h2 {
     text-align: center;
 }
 
-.hero h2 {
-    text-align: center;
-}
-
 .hero-buttons,
 .social-buttons {
     justify-content: center;
@@ -145,7 +141,7 @@ h2 {
 
 .hero h2 {
     font-size: clamp(1.1rem, 2vw, 2.1rem);
-    text-align: left;
+    text-align: center;
     margin: 0 0 12px;
     color: var(--muted);
     font-weight: 600;
