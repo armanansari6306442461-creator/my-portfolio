@@ -1,11 +1,11 @@
 $ErrorActionPreference = 'Continue'
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$watchedFiles = @('index.html', 'style.css', 'script.js')
+$watchedExtensions = @('.html', '.css', '.js')
 $watcher = New-Object System.IO.FileSystemWatcher
 $watcher.Path = $repoRoot
 $watcher.Filter = '*'
-$watcher.IncludeSubdirectories = $false
+$watcher.IncludeSubdirectories = $true
 $watcher.NotifyFilter = [System.IO.NotifyFilters]::LastWrite -bor [System.IO.NotifyFilters]::FileName -bor [System.IO.NotifyFilters]::Size
 $watcher.EnableRaisingEvents = $true
 
@@ -14,7 +14,12 @@ Write-Output 'Portfolio auto-push watcher ready'
 
 while ($true) {
     $change = $watcher.WaitForChanged([System.IO.WatcherChangeTypes]::All, 1000)
-    if ($change.TimedOut -or $watchedFiles -notcontains $change.Name) {
+    if ($change.TimedOut -or [string]::IsNullOrWhiteSpace($change.Name)) {
+        continue
+    }
+
+    $changedExtension = [System.IO.Path]::GetExtension($change.Name).ToLowerInvariant()
+    if ($watchedExtensions -notcontains $changedExtension) {
         continue
     }
 
@@ -22,7 +27,7 @@ while ($true) {
         $change = $watcher.WaitForChanged([System.IO.WatcherChangeTypes]::All, 1200)
     } while (-not $change.TimedOut)
 
-    $status = & git -C $repoRoot status --porcelain -- $watchedFiles
+    $status = & git -C $repoRoot status --porcelain -- '*.html' '*.css' '*.js'
     if ($LASTEXITCODE -ne 0) {
         Write-Output 'ERROR: Git status failed; will retry after the next save.'
         continue
@@ -31,7 +36,7 @@ while ($true) {
         continue
     }
 
-    & git -C $repoRoot add -- $watchedFiles
+    & git -C $repoRoot add -- '*.html' '*.css' '*.js'
     if ($LASTEXITCODE -ne 0) {
         Write-Output 'ERROR: Git staging failed; will retry after the next save.'
         continue
