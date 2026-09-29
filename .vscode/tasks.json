@@ -1,0 +1,33 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Auto-push portfolio on save",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"${workspaceFolder}\\.vscode\\auto-push-on-save.ps1"
+			],
+			"isBackground": true,
+			"runOptions": {
+				"runOn": "folderOpen"
+			},
+			"problemMatcher": {
+				"owner": "portfolio-auto-push",
+				"pattern": {
+					"regexp": "^ERROR: (.*)$",
+					"message": 1
+				},
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": "^Starting portfolio auto-push watcher",
+					"endsPattern": "^Portfolio auto-push watcher ready"
+				}
+			}
+		}
+	]
+}
